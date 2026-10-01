@@ -19,7 +19,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 button{font:inherit;color:inherit;cursor:pointer}
 .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
 :focus-visible{outline:2px solid var(--fc);outline-offset:2px}
-svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .app{height:var(--tg-viewport-stable-height,100dvh);display:flex;flex-direction:column;padding-top:var(--sat)}
 
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}
@@ -59,10 +59,6 @@ nav.tabs{flex:none;display:grid;grid-template-columns:repeat(4,1fr);padding:0 10
 .chip[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:var(--ai)}
 .chip.all{border-style:dashed;color:var(--ac2)}
 .fxrow .chip{min-height:48px;font-size:15px}
-.card{flex:none;width:156px;scroll-snap-align:start;text-align:left;padding:10px;border-radius:16px;border:1.5px solid var(--ln);background:var(--s1);display:grid;gap:6px}
-.card[aria-pressed=true]{border-color:var(--ac2);box-shadow:inset 0 0 0 1px var(--ac2)}
-.sw{height:34px;border-radius:9px}
-.card b{font-size:14px;display:block}.card span{font-size:12px;color:var(--mu);line-height:1.3;display:block}
 
 .sl{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
 .sl label{display:flex;justify-content:space-between;font-size:13px}.sl label i{font-style:normal;color:var(--ac2);font-weight:700}
@@ -101,12 +97,60 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
 .cred{text-align:center;font-size:12px;color:var(--mu);padding:0 16px 12px}.cred a{color:var(--ac2)}
 .toast{position:fixed;left:50%;bottom:calc(84px + var(--sab));transform:translate(-50%,8px);z-index:90;background:var(--s3);color:var(--tx);border:1px solid var(--ln);padding:11px 16px;border-radius:999px;font-size:13px;max-width:90vw;text-align:center;opacity:0;pointer-events:none;transition:.2s;display:flex;gap:8px;align-items:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}.toast svg{width:16px;height:16px}
-#busy{position:fixed;inset:0;z-index:80;background:rgba(5,12,9,.78);color:#fff;display:none;place-items:center;text-align:center}
-#busy.show{display:grid}#busy div{display:grid;gap:10px;justify-items:center}
-.spin{width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:var(--ac);animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}.spin{animation-duration:2s}}
 @media (min-width:600px){.app{max-width:560px;margin:0 auto}.sheet{max-width:560px;margin:0 auto}.modal{justify-content:center}}
+
+/* ---- v3: preset thumbnails, motion, polish ---- */
+button{transition:transform .14s cubic-bezier(.3,.7,.4,1),background-color .22s,border-color .22s,color .22s,opacity .2s,box-shadow .22s}
+button:active:not(:disabled){transform:scale(.96)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pane{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:.35;transform:scale(1.03);filter:blur(8px) saturate(1.6)}100%{opacity:1;transform:none;filter:none}}
+@keyframes reveal{0%{clip-path:inset(0 100% 0 0);transform:scale(1.05);filter:blur(10px)}55%{filter:blur(0)}100%{clip-path:inset(0);transform:none;filter:none}}
+@keyframes sweep{0%{transform:translateX(-120%);opacity:0}20%,80%{opacity:1}100%{transform:translateX(330%);opacity:0}}
+@keyframes shim{to{background-position:-200% 0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes breathe{50%{transform:scale(.9)}}
+@keyframes ind{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+@keyframes okpop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+@keyframes chip{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:none}}
+.app>*{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.app>main{animation-delay:.07s}.app>nav,.app>section{animation-delay:.14s}.app>footer{animation-delay:.21s}
+.pane.on{animation:pane .28s cubic-bezier(.2,.8,.2,1)}
+.tab::after{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--ac2);transform:scaleX(0);transition:transform .28s cubic-bezier(.3,.7,.4,1)}
+.tab[aria-selected=true]::after{transform:scaleX(1)}
+.tab svg{transition:transform .28s cubic-bezier(.3,1.4,.5,1)}.tab[aria-selected=true] svg{transform:translateY(-2px) scale(1.12)}
+.chip[aria-pressed=true]{animation:chip .3s}
+.stage{background:radial-gradient(120% 75% at 50% 0,var(--s2),var(--s1) 72%)}
+.stage canvas.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+.stage canvas.reveal{animation:reveal .9s cubic-bezier(.2,.75,.2,1)}
+.swp{position:absolute;top:0;bottom:0;left:0;width:34%;pointer-events:none;opacity:0;background:linear-gradient(100deg,transparent,color-mix(in srgb,var(--ac) 42%,transparent),transparent)}
+.swp.go{animation:sweep .75s cubic-bezier(.4,0,.2,1)}
+.stage.loading::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.14) 50%,transparent 70%) 0 0/200% 100%;animation:shim 1s linear infinite}
+.empty .ring{animation:float 4.2s ease-in-out infinite}
+.primary:not(:disabled){box-shadow:0 8px 22px -10px var(--ac)}
+.card{flex:none;width:238px;scroll-snap-align:start;text-align:left;padding:8px;border-radius:18px;border:1.5px solid var(--ln);background:var(--s1);display:flex;align-items:center;gap:12px;position:relative}
+.card[aria-pressed=true]{border-color:var(--ac2);box-shadow:0 0 0 1px var(--ac2),0 10px 22px -12px var(--ac2)}
+.card[aria-pressed=true]::after{content:"";position:absolute;top:10px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--ac2);animation:okpop .35s both}
+.th{position:relative;flex:none;width:68px;height:68px;border-radius:12px;overflow:hidden;display:block}
+.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.18);transition:opacity .45s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.card.rd .th img{opacity:1;transform:none}
+.card.ld .th::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%) 0 0/200% 100%;animation:shim 1s linear infinite}
+.tx{min-width:0;display:grid;gap:2px;padding-right:14px}.tx b{font-size:14px}.tx span{font-size:12px;color:var(--mu);line-height:1.3}
+.sheet{transition:transform .34s cubic-bezier(.2,.9,.25,1)}
+.fc{animation:rise .38s cubic-bezier(.2,.8,.2,1) both}
+#busy{position:fixed;inset:0;z-index:80;background:rgba(5,12,9,.8);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;display:grid;place-items:center;text-align:center;visibility:hidden;opacity:0;transition:opacity .22s,visibility .22s}
+#busy.show{visibility:visible;opacity:1}
+.bc{display:grid;gap:12px;justify-items:center;padding:0 24px}
+.orb{position:relative;width:100px;height:100px;display:grid;place-items:center}
+.orb::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 25%,var(--ac));-webkit-mask:radial-gradient(circle,transparent 61%,#000 63%);mask:radial-gradient(circle,transparent 61%,#000 63%);animation:sp .9s linear infinite}
+.orb .logo{width:62px;height:62px;border-radius:20px;animation:breathe 1.4s ease-in-out infinite}
+.bar{width:190px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden}.bar i{display:block;width:40%;height:100%;border-radius:2px;background:var(--ac);animation:ind 1.1s ease-in-out infinite}
+.res>*{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}.res>:nth-child(2){animation-delay:.07s}.res>:nth-child(3){animation-delay:.14s}.res>:nth-child(4){animation-delay:.2s}.res>:nth-child(5){animation-delay:.26s}
+.okrow{display:flex;align-items:center;gap:10px}.okrow .note{margin:0}
+.okb{flex:none;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--ac2) 22%,transparent);color:var(--ac2);display:grid;place-items:center;animation:okpop .55s .2s both cubic-bezier(.3,1.4,.5,1)}
+.primary svg,.btn2 svg{width:20px;height:20px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -117,13 +161,13 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
     <span><b>Bangali Icon</b><small>Effects Studio</small></span>
   </button>
   <div class="hr">
-    <button class="pill mono" id="limitPill" aria-label="Exports left"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span id="limitNum">5/5</span></button>
-    <button class="sq" id="profileBtn" aria-label="Profile and credits"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.6-4 4.6-6 7-6s5.4 2 7 6"/></svg></button>
+    <button class="pill mono" id="limitPill" aria-label="Exports left"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L14 14"/></svg><span id="limitNum">5/5</span></button>
+    <button class="sq" id="profileBtn" aria-label="Profile and credits"><svg viewBox="0 0 24 24"><path d="M20 21.0001C19.713 17.269 16.7289 14.3151 12.995 14.0662L12 13.9999C11.6446 14.0096 11.3134 14.0225 11.0008 14.0378C7.3 14.2192 4.28417 17.3057 4 21.0001"/><circle cx="12" cy="6.99988" r="4"/></svg></button>
   </div>
 </header>
 
 <main class="stage" id="stage">
-  <canvas id="canvas" width="800" height="800" aria-label="Photo preview. Press and hold to compare with the original."></canvas>
+  <canvas id="canvas" width="800" height="800" aria-label="Photo preview. Press and hold to compare with the original."></canvas><i class="swp" id="sweep"></i>
   <div class="empty">
     <div class="ring" aria-hidden="true"></div>
     <h2>Pick a photo to start</h2>
@@ -131,37 +175,37 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
     <button class="primary" id="pickBtn" style="width:auto;padding:0 28px">Choose photo</button>
   </div>
   <span class="chip-st mono" id="status" role="status"></span>
-  <button class="swap" id="swapBtn" aria-label="Choose a different photo"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M12 9v6M9 12h6"/></svg></button>
+  <button class="swap" id="swapBtn" aria-label="Choose a different photo"><svg viewBox="0 0 24 24"><path d="M11.5085 2.9903C7.02567 2.9903 4.78428 2.9903 3.39164 4.38238C1.99902 5.77447 1.99902 8.015 1.99902 12.4961C1.99902 16.9771 1.99902 19.2176 3.39164 20.6098C4.78428 22.0018 7.02567 22.0018 11.5085 22.0018C15.9912 22.0018 18.2326 22.0018 19.6253 20.6098C21.0179 19.2176 21.0179 16.9771 21.0179 12.4961V11.9958"/><path d="M4.99902 20.9898C9.209 16.2385 13.9402 9.93727 20.999 14.6632"/><path d="M17.9958 1.99829V10.0064M22.0014 5.97728L13.9902 5.99217"/></svg></button>
   <input type="file" id="file" accept="image/*" hidden>
 </main>
 
 <nav class="tabs" role="tablist" aria-label="Editor sections">
-  <button class="tab" role="tab" data-p="fx" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg>Effects</button>
-  <button class="tab" role="tab" data-p="pre" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>Presets</button>
-  <button class="tab" role="tab" data-p="adj" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 5v4M8 15v4"/></svg>Adjust</button>
-  <button class="tab" role="tab" data-p="frm" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg>Frame</button>
+  <button class="tab" role="tab" data-p="fx" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M13.427 8.08396C12.8007 5.84272 12.3226 4 11.0004 4C9.67824 4 9.19964 5.84274 8.5731 8.08399C8.31853 8.99465 8.19125 9.44998 7.82042 9.82077C7.4496 10.1916 6.99434 10.3188 6.08381 10.5732C3.84273 11.1995 2 11.6775 2 13C2 14.3225 3.84273 14.8005 6.08381 15.4268C6.99434 15.6812 7.4496 15.8084 7.82042 16.1792C8.19125 16.55 8.31853 17.0054 8.5731 17.916C9.19964 20.1573 9.67824 22 11.0004 22C12.3226 22 12.8007 20.1573 13.427 17.916C13.6815 17.0054 13.8087 16.5501 14.1795 16.1793C14.5504 15.8085 15.0056 15.6812 15.9162 15.4268C18.1573 14.8005 20 14.3225 20 13C20 11.6775 18.1573 11.1995 15.9162 10.5732C15.0056 10.3188 14.5504 10.1915 14.1795 9.8207C13.8087 9.44986 13.6815 8.99456 13.427 8.08396Z"/><path d="M19.5 2.9375V4.5M19.5 4.5V6.0625M19.5 4.5H18.25M19.5 4.5H20.75M22 4.5L21.548 4.34934C20.8497 4.11658 20.5006 4.00019 20.2502 3.74981C19.9998 3.49942 19.8834 3.15027 19.6507 2.45198L19.5 2L19.3493 2.45198C19.1166 3.15027 19.0002 3.49942 18.7498 3.74981C18.4994 4.00019 18.1503 4.11658 17.452 4.34934L17 4.5L17.452 4.65066C18.1503 4.88342 18.4994 4.99981 18.7498 5.25019C19.0002 5.50058 19.1166 5.84973 19.3493 6.54802L19.5 7L19.6507 6.54802C19.8834 5.84973 19.9998 5.50058 20.2502 5.25019C20.5006 4.99981 20.8497 4.88342 21.548 4.65066L22 4.5Z"/></svg>Effects</button>
+  <button class="tab" role="tab" data-p="pre" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3.88884 9.66294C4.39329 10 5.09552 10 6.49998 10C7.90445 10 8.60668 10 9.11113 9.66294C9.32951 9.51702 9.51701 9.32952 9.66292 9.11114C9.99998 8.60669 9.99998 7.90446 9.99998 6.5C9.99998 5.09554 9.99998 4.39331 9.66292 3.88886C9.51701 3.67048 9.32951 3.48298 9.11113 3.33706C8.60668 3 7.90445 3 6.49998 3C5.09552 3 4.39329 3 3.88884 3.33706C3.67046 3.48298 3.48296 3.67048 3.33705 3.88886C2.99998 4.39331 2.99998 5.09554 2.99998 6.5C2.99998 7.90446 2.99998 8.60669 3.33705 9.11114C3.48296 9.32952 3.67046 9.51702 3.88884 9.66294Z"/><path d="M14.8888 9.66294C15.3933 10 16.0955 10 17.5 10C18.9044 10 19.6067 10 20.1111 9.66294C20.3295 9.51702 20.517 9.32952 20.6629 9.11114C21 8.60669 21 7.90446 21 6.5C21 5.09554 21 4.39331 20.6629 3.88886C20.517 3.67048 20.3295 3.48298 20.1111 3.33706C19.6067 3 18.9044 3 17.5 3C16.0955 3 15.3933 3 14.8888 3.33706C14.6705 3.48298 14.483 3.67048 14.337 3.88886C14 4.39331 14 5.09554 14 6.5C14 7.90446 14 8.60669 14.337 9.11114C14.483 9.32952 14.6705 9.51702 14.8888 9.66294Z"/><path d="M3.88884 20.6629C4.39329 21 5.09552 21 6.49998 21C7.90445 21 8.60668 21 9.11113 20.6629C9.32951 20.517 9.51701 20.3295 9.66292 20.1111C9.99998 19.6067 9.99998 18.9045 9.99998 17.5C9.99998 16.0955 9.99998 15.3933 9.66292 14.8889C9.51701 14.6705 9.32951 14.483 9.11113 14.3371C8.60668 14 7.90445 14 6.49998 14C5.09552 14 4.39329 14 3.88884 14.3371C3.67046 14.483 3.48296 14.6705 3.33705 14.8889C2.99998 15.3933 2.99998 16.0955 2.99998 17.5C2.99998 18.9045 2.99998 19.6067 3.33705 20.1111C3.48296 20.3295 3.67046 20.517 3.88884 20.6629Z"/><path d="M14.8888 20.6629C15.3933 21 16.0955 21 17.5 21C18.9044 21 19.6067 21 20.1111 20.6629C20.3295 20.517 20.517 20.3295 20.6629 20.1111C21 19.6067 21 18.9045 21 17.5C21 16.0955 21 15.3933 20.6629 14.8889C20.517 14.6705 20.3295 14.483 20.1111 14.3371C19.6067 14 18.9044 14 17.5 14C16.0955 14 15.3933 14 14.8888 14.3371C14.6705 14.483 14.483 14.6705 14.337 14.8889C14 15.3933 14 16.0955 14 17.5C14 18.9045 14 19.6067 14.337 20.1111C14.483 20.3295 14.6705 20.517 14.8888 20.6629Z"/></svg>Presets</button>
+  <button class="tab" role="tab" data-p="adj" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3.99963 5.00055L9.99963 5.00031"/><path d="M12.9996 5.00031L19.9996 5.00031"/><path d="M15.9996 9.00031L15.9996 15.0003"/><path d="M9.99963 2.00031L9.99963 8.00031"/><path d="M11.9996 16.0003L11.9996 22.0003"/><path d="M15.9996 12.0001L19.9996 12.0003"/><path d="M3.99963 12.0005L12.9996 12.0003"/><path d="M11.9996 19.0003L19.9996 19.0003"/><path d="M3.99963 19.0005L8.99963 19.0003"/></svg>Adjust</button>
+  <button class="tab" role="tab" data-p="frm" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 2V4M22 20H20M16.5 20H10C7.17157 20 5.75736 20 4.87868 19.1213C4 18.2426 4 16.8284 4 14V7.5"/><path d="M20 22L20 12C20 8.22877 20 6.34315 18.8284 5.17158C17.6569 4 15.7712 4 12 4L2 4"/></svg>Frame</button>
 </nav>
 <section class="panel" id="panel">
   <div class="pane on" id="p-fx"><div class="row" id="catRow"></div><div class="row fxrow" id="fxRow"></div></div>
   <div class="pane" id="p-pre"><div class="row" id="preRow"></div></div>
-  <div class="pane" id="p-adj"><div class="sl" id="sl"></div><button class="btn2" id="resetP" style="margin-top:6px"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 12a8 8 0 1 1 2.6 5.9"/><path d="M4 20v-5h5"/></svg>Reset adjustments</button></div>
+  <div class="pane" id="p-adj"><div class="sl" id="sl"></div><button class="btn2" id="resetP" style="margin-top:6px"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M20.0092 2V5.13219C20.0092 5.42605 19.6418 5.55908 19.4537 5.33333C17.6226 3.2875 14.9617 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12"/></svg>Reset adjustments</button></div>
   <div class="pane" id="p-frm"><p class="lbl">Aspect ratio</p><div class="row" id="ratioRow"></div><p class="lbl">Crop mode</p>
     <div class="seg" id="cropSeg"><button data-v="crop" aria-pressed="true">Crop to fill</button><button data-v="pad" aria-pressed="false">Pad to fit</button></div></div>
 </section>
 
 <footer>
-  <button class="sec" id="sendBtn" disabled aria-label="Send settings to bot chat"><svg viewBox="0 0 24 24"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg>Send</button>
-  <button class="primary" id="exportBtn" disabled><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button>
+  <button class="sec" id="sendBtn" disabled aria-label="Send settings to bot chat"><svg viewBox="0 0 24 24"><path d="M21.0477 3.05293C18.8697 0.707363 2.48648 6.4532 2.50001 8.551C2.51535 10.9299 8.89809 11.6617 10.6672 12.1581C11.7311 12.4565 12.016 12.7625 12.2613 13.8781C13.3723 18.9305 13.9301 21.4435 15.2014 21.4996C17.2278 21.5892 23.1733 5.342 21.0477 3.05293Z"/><path d="M11.4999 12.5L14.9999 9"/></svg>Send</button>
+  <button class="primary" id="exportBtn" disabled><svg viewBox="0 0 24 24"><path d="M2.99969 17.0002C2.99969 17.9302 2.99969 18.3952 3.10192 18.7767C3.37932 19.8119 4.18796 20.6206 5.22324 20.898C5.60474 21.0002 6.06972 21.0002 6.99969 21.0002L16.9997 21.0002C17.9297 21.0002 18.3947 21.0002 18.7762 20.898C19.8114 20.6206 20.6201 19.8119 20.8975 18.7767C20.9997 18.3952 20.9997 17.9302 20.9997 17.0002"/><path d="M16.4998 11.5002C16.4998 11.5002 13.1856 16.0002 11.9997 16.0002C10.8139 16.0002 7.49976 11.5002 7.49976 11.5002M11.9997 15.0002V3.00016"/></svg>Export</button>
 </footer>
 </div>
 
 <div class="modal" id="mGal" role="dialog" aria-modal="true" aria-labelledby="gT"><div class="sheet">
-  <div class="mh"><h2 id="gT">All 38 effects</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="mh"><h2 id="gT">All 38 effects</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6.00081 17.9992M17.9992 18L6 6.00085"/></svg></button></div>
   <div class="mb"><div class="grid" id="grid"></div></div>
 </div></div>
 
 <div class="modal" id="mExp" role="dialog" aria-modal="true" aria-labelledby="eT"><div class="sheet">
-  <div class="mh"><h2 id="eT">Export</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="mh"><h2 id="eT">Export</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6.00081 17.9992M17.9992 18L6 6.00085"/></svg></button></div>
   <div class="mb">
     <div id="exSet" style="display:grid;gap:16px">
       <div><p class="lbl">Format</p><div class="seg" id="fmtSeg"><button data-v="png" aria-pressed="true">PNG</button><button data-v="jpeg" aria-pressed="false">JPEG</button><button data-v="webp" aria-pressed="false">WEBP</button></div></div>
@@ -170,9 +214,7 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
       <button class="primary" id="exGo">Create image</button>
     </div>
     <div class="res" id="exRes" hidden style="display:none;gap:14px">
-      <img id="exImg" alt="Exported image preview">
-      <p class="note mono" id="exMeta"></p>
-      <button class="primary" id="exSave"></button>
+      <div class="okrow"><span class="okb"><svg viewBox="0 0 24 24"><path d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"/><path d="M8 12.5L10.5 15L16 9"/></svg></span><p class="note mono" id="exMeta"></p></div><img id="exImg" alt="Exported image preview"><button class="primary" id="exSave"><svg viewBox="0 0 24 24"><path d="M2.99969 17.0002C2.99969 17.9302 2.99969 18.3952 3.10192 18.7767C3.37932 19.8119 4.18796 20.6206 5.22324 20.898C5.60474 21.0002 6.06972 21.0002 6.99969 21.0002L16.9997 21.0002C17.9297 21.0002 18.3947 21.0002 18.7762 20.898C19.8114 20.6206 20.6201 19.8119 20.8975 18.7767C20.9997 18.3952 20.9997 17.9302 20.9997 17.0002"/><path d="M16.4998 11.5002C16.4998 11.5002 13.1856 16.0002 11.9997 16.0002C10.8139 16.0002 7.49976 11.5002 7.49976 11.5002M11.9997 15.0002V3.00016"/></svg><span id="exSaveT"></span></button>
       <button class="btn2" id="exBack">Change settings</button>
       <p class="note">Nothing saved? Press and hold the image above, then choose Save or Add to Photos.</p>
     </div>
@@ -181,7 +223,7 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
 </div></div>
 
 <div class="modal" id="mPro" role="dialog" aria-modal="true" aria-labelledby="pT"><div class="sheet">
-  <div class="mh"><h2 id="pT">Profile &amp; usage</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="mh"><h2 id="pT">Profile &amp; usage</h2><button class="sq" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6.00081 17.9992M17.9992 18L6 6.00085"/></svg></button></div>
   <div class="mb">
     <div><p class="lbl">Credits left <i class="mono" id="pNum">5/5</i></p><div class="meter"><i id="pBar" style="width:100%"></i></div>
     <p class="note" lang="bn" style="margin-top:10px">প্রতি ৬০ সেকেন্ডে ৫টি হেভি অ্যাকশন (Export / Send) ফ্রি। শেষ হয়ে গেলে নিচের বাটনে অতিরিক্ত ক্রেডিট রিকোয়েস্ট করতে পারেন।</p></div>
@@ -190,7 +232,7 @@ footer{flex:none;display:flex;gap:10px;padding:10px 14px calc(10px + var(--sab))
   <div class="cred">Designed &amp; developed by <a href="https://t.me/YA_Rabbu" data-tg>@YA_Rabbu</a></div>
 </div></div>
 
-<div id="busy" role="alert" aria-live="assertive"><div><div class="spin"></div><b id="busyT">Working…</b><span id="busyS" style="opacity:.7;font-size:12px"></span></div></div>
+<div id="busy" role="alert" aria-live="assertive"><div class="bc"><div class="orb"><span class="logo" aria-hidden="true"></span></div><b id="busyT">Working…</b><span id="busyS" style="opacity:.72;font-size:12px"></span><div class="bar" aria-hidden="true"><i></i></div></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -209,7 +251,7 @@ const link=u=>{if(tg&&tg.openTelegramLink&&/^https:\/\/t\.me\//.test(u))tg.openT
 $("#brand").onclick=()=>link("https://t.me/BangaliIconBot");
 $$("a[data-tg]").forEach(a=>a.onclick=e=>{e.preventDefault();link(a.href)});
 
-const IC={ok:'<svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg>',warn:'<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 2.7 17.1A1.7 1.7 0 0 0 4.2 19.7h15.6a1.7 1.7 0 0 0 1.5-2.6L13.7 3.9a1.7 1.7 0 0 0-3.4 0Z"/></svg>'};
+const IC={ok:'<svg viewBox="0 0 24 24"><path d="M5 14L8.5 17.5L19 6.5"/></svg>',warn:'<svg viewBox="0 0 24 24"><path d="M13.9248 21H10.0752C5.44476 21 3.12955 21 2.27636 19.4939C1.42317 17.9879 2.60736 15.9914 4.97574 11.9985L6.90057 8.75333C9.17559 4.91778 10.3131 3 12 3C13.6869 3 14.8244 4.91777 17.0994 8.75332L19.0243 11.9985C21.3926 15.9914 22.5768 17.9879 21.7236 19.4939C20.8704 21 18.5552 21 13.9248 21Z"/><path d="M12 9V13"/><path d="M12.125 16.75H12M12.25 16.75C12.25 16.8881 12.1381 17 12 17C11.8619 17 11.75 16.8881 11.75 16.75C11.75 16.6119 11.8619 16.5 12 16.5C12.1381 16.5 12.25 16.6119 12.25 16.75Z"/></svg>'};
 let tt;const toast=(m,i)=>{const t=$("#toast");t.innerHTML=(IC[i]||"")+"<span></span>";t.lastChild.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),3200)};
 const busy=(on,t,s)=>{$("#busy").classList.toggle("show",on);if(t)$("#busyT").textContent=t;$("#busyS").textContent=s||""};
 
@@ -327,11 +369,16 @@ const PRE=[["golden-hour","Golden Hour","autumn-tone","Warm sunset, gentle grain
 const catRow=$("#catRow"),fxRow=$("#fxRow");
 function buildCats(){catRow.innerHTML="";Object.keys(CATS).forEach(c=>{const b=el("button","chip",CATS[c]);b.setAttribute("aria-pressed",c===cat);b.onclick=()=>{cat=c;buildCats();buildFx()};catRow.append(b)});const a=el("button","chip all","All 38");a.onclick=openGallery;catRow.append(a)}
 function buildFx(){fxRow.innerHTML="";FX.filter(e=>e[2]===cat).forEach(e=>{const b=el("button","chip",e[1]);b.dataset.id=e[0];b.setAttribute("aria-pressed",e[0]===fx);b.onclick=()=>{preset=null;pick(e[0])};fxRow.append(b)})}
-function pick(id){fx=id;if(FM[id].c!==cat){cat=FM[id].c;buildCats();buildFx()}else $$("#fxRow .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===id));paintPre();dotState();render();haptic("light");
+function pick(id){fx=id;if(FM[id].c!==cat){cat=FM[id].c;buildCats();buildFx()}else $$("#fxRow .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===id));paintPre();dotState();animNext="pop";render();haptic("light");
  const a=fxRow.querySelector('[aria-pressed="true"]');a&&a.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"})}
 const preRow=$("#preRow");
-PRE.forEach(p=>{const b=el("button","card");b.dataset.id=p[0];b.innerHTML='<i class="sw" style="background:linear-gradient(120deg,'+p[5]+','+p[6]+')"></i><b></b><span></span>';b.querySelector("b").textContent=p[1];b.querySelector("span").textContent=p[3];
+PRE.forEach(p=>{const b=el("button","card");b.dataset.id=p[0];b.innerHTML='<span class="th" style="background:linear-gradient(120deg,'+p[5]+','+p[6]+')"><img alt=""></span><span class="tx"><b></b><span></span></span>';b.querySelector("b").textContent=p[1];b.querySelector(".tx span").textContent=p[3];
  b.onclick=()=>{preset=p[0];Object.assign(P,DEF,p[4]);syncSl();pick(p[2]);toast(p[1]+" applied","ok")};preRow.append(b)});
+/* live preview of each preset on the uploaded photo */
+let thumbGen=0;
+function buildThumbs(){const g=++thumbGen;if(!img)return;const T=128,m=Math.min(src.width,src.height),t=document.createElement("canvas");t.width=t.height=T;t.getContext("2d").drawImage(src,(src.width-m)/2,(src.height-m)/2,m,m,0,0,T,T);const fr=t.getContext("2d").getImageData(0,0,T,T),cards=[...preRow.children];
+ cards.forEach(c=>{c.classList.remove("rd");c.classList.add("ld")});let n=0;
+ (function next(){if(g!==thumbGen||n>=PRE.length)return;const p=PRE[n],c=cards[n++],u=toC(apply(p[2],fr,{...DEF,...p[4]},T/WORK)).toDataURL("image/jpeg",.8),im=c.querySelector("img");im.onload=()=>{c.classList.remove("ld");c.classList.add("rd")};im.src=u;setTimeout(next,60)})()}
 function paintPre(){$$("#preRow .card").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===preset))}
 const SL=[["contrast","Contrast",.2,3,.1],["brightness","Brightness",.2,3,.1],["grainIntensity","Grain",0,100,5],["vignette","Vignette",0,1,.1],["dotPitch","Dot pitch",2,40,1]];
 const fmt=(k,v)=>k==="grainIntensity"||k==="dotPitch"?String(Math.round(v)):(+v).toFixed(1);
@@ -354,18 +401,21 @@ $$(".tab").forEach(t=>t.onclick=()=>{const was=t.getAttribute("aria-selected")==
 const status=m=>$("#status").textContent=m;
 const pickFile=()=>$("#file").click();
 $("#pickBtn").onclick=pickFile;$("#swapBtn").onclick=pickFile;
-$("#file").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);const im=new Image();
+$("#file").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;stage.classList.add("loading");if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);const im=new Image();
  im.onload=()=>{img=im;const k=Math.min(WORK/im.naturalWidth,WORK/im.naturalHeight,1);src.width=Math.max(1,Math.round(im.naturalWidth*k));src.height=Math.max(1,Math.round(im.naturalHeight*k));sctx.drawImage(im,0,0,src.width,src.height);
-  stage.classList.add("has");$("#sendBtn").disabled=$("#exportBtn").disabled=false;render(true);status("Hold the photo to compare");setTimeout(()=>status(FM[fx].n+" · "+cv.width+"×"+cv.height),3000)};
- im.onerror=()=>toast("Can't open this file. Try a JPG or PNG.","warn");im.src=url;e.target.value=""};
-let rt;function render(now){if(!img)return;clearTimeout(rt);rt=setTimeout(()=>{const w=src.width,h=src.height,o=apply(fx,sctx.getImageData(0,0,w,h),P,1);last=frame(toC(o),P.aspectRatio,P.cropMode);cv.width=last.width;cv.height=last.height;cx.drawImage(last,0,0);if(!now)status(FM[fx].n+" · "+last.width+"×"+last.height)},now?0:30)}
+  stage.classList.remove("loading");stage.classList.add("has");$("#sendBtn").disabled=$("#exportBtn").disabled=false;animNext="reveal";render(true);status("Hold the photo to compare");setTimeout(()=>status(FM[fx].n+" · "+cv.width+"×"+cv.height),3200);setTimeout(buildThumbs,500)};
+ im.onerror=()=>{stage.classList.remove("loading");toast("Can't open this file. Try a JPG or PNG.","warn")};im.src=url;e.target.value=""};
+let rt,animNext=null;const swp=$("#sweep");
+const anim=(n,c)=>{n.classList.remove(c);void n.offsetWidth;n.classList.add(c)};
+cv.addEventListener("animationend",()=>cv.classList.remove("pop","reveal"));swp.addEventListener("animationend",()=>swp.classList.remove("go"));
+function render(now){if(!img)return;clearTimeout(rt);rt=setTimeout(()=>{const w=src.width,h=src.height,o=apply(fx,sctx.getImageData(0,0,w,h),P,1);last=frame(toC(o),P.aspectRatio,P.cropMode);cv.width=last.width;cv.height=last.height;cx.drawImage(last,0,0);if(!now)status(FM[fx].n+" · "+last.width+"×"+last.height);if(animNext){anim(cv,animNext);anim(swp,"go");animNext=null}},now?0:30)}
 /* hold to compare with original */
 const cmp=on=>{if(!img||!last)return;if(on){const f=frame(src,P.aspectRatio,P.cropMode);cx.drawImage(f,0,0,cv.width,cv.height);status("Original")}else{cx.drawImage(last,0,0);status(FM[fx].n+" · "+cv.width+"×"+cv.height)}};
 cv.addEventListener("pointerdown",()=>cmp(true));["pointerup","pointercancel","pointerleave"].forEach(n=>cv.addEventListener(n,()=>cmp(false)));cv.addEventListener("contextmenu",e=>e.preventDefault());
 
 /* ---------- Gallery ---------- */
 function openGallery(){if(!img){pickFile();return}const g=$("#grid");g.innerHTML="";const T=120,m=Math.min(src.width,src.height),t=document.createElement("canvas");t.width=t.height=T;t.getContext("2d").drawImage(src,(src.width-m)/2,(src.height-m)/2,m,m,0,0,T,T);const fr=t.getContext("2d").getImageData(0,0,T,T);
- FX.forEach(e=>{const u=toC(apply(e[0],fr,P,T/WORK)).toDataURL("image/jpeg",.7),b=el("button","fc"+(e[0]===fx?" on":""));b.innerHTML='<img alt=""><span></span>';b.firstChild.src=u;b.lastChild.textContent=e[1];b.onclick=()=>{preset=null;hideM();pick(e[0])};g.append(b)});showM($("#mGal"))}
+ FX.forEach((e,i)=>{const u=toC(apply(e[0],fr,P,T/WORK)).toDataURL("image/jpeg",.7),b=el("button","fc"+(e[0]===fx?" on":""));b.innerHTML='<img alt=""><span></span>';b.firstChild.src=u;b.lastChild.textContent=e[1];b.onclick=()=>{preset=null;hideM();pick(e[0])};b.style.animationDelay=i*16+"ms";g.append(b)});showM($("#mGal"))}
 
 /* ---------- Export: render once, then save from a fresh tap ---------- */
 let exF="png",exS=2,out=null;
@@ -382,11 +432,11 @@ $("#exGo").onclick=async()=>{
   const c=document.createElement("canvas");c.width=tw;c.height=th;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,tw,th);
   const fr=frame(toC(apply(fx,x.getImageData(0,0,tw,th),P,side/Math.max(src.width,src.height))),P.aspectRatio,P.cropMode);
   const mime={png:"image/png",jpeg:"image/jpeg",webp:"image/webp"}[exF];
-  const blob=await new Promise(r=>fr.toBlob(r,mime,exF==="png"?undefined:+$("#q").value));if(!blob)throw new Error("This device can't encode that format");
+  busy(true,"Encoding file…","Almost there");await new Promise(r=>setTimeout(r,30));const blob=await new Promise(r=>fr.toBlob(r,mime,exF==="png"?undefined:+$("#q").value));if(!blob)throw new Error("This device can't encode that format");
   if(out)URL.revokeObjectURL(out.url);const ext=blob.type==="image/jpeg"?"jpg":blob.type.split("/")[1];
   out={blob,url:URL.createObjectURL(blob),name:"bangaliicon-"+fx+"-"+fr.width+"x"+fr.height+"."+ext,w:fr.width,h:fr.height};
   spend();$("#exImg").src=out.url;$("#exMeta").textContent=out.w+"×"+out.h+" · "+ext.toUpperCase()+" · "+kb(blob.size);
-  $("#exSave").textContent=(mobile&&navigator.canShare)?"Save or share image":"Save image";exView(true);haptic("success")}
+  $("#exSaveT").textContent=(mobile&&navigator.canShare)?"Save or share image":"Save image";busy(true,"Done","Your image is ready");haptic("success");await new Promise(r=>setTimeout(r,450));exView(true)}
  catch(e){toast("Export failed: "+(e&&e.message||"unknown error"),"warn");haptic("error")}finally{busy(false)}};
 $("#exBack").onclick=()=>exView(false);
 $("#exSave").onclick=async()=>{if(!out)return;const f=new File([out.blob],out.name,{type:out.blob.type});
