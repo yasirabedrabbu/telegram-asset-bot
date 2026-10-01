@@ -439,13 +439,96 @@ $("#exGo").onclick=async()=>{
   $("#exSaveT").textContent=(mobile&&navigator.canShare)?"Save or share image":"Save image";busy(true,"Done","Your image is ready");haptic("success");await new Promise(r=>setTimeout(r,450));exView(true)}
  catch(e){toast("Export failed: "+(e&&e.message||"unknown error"),"warn");haptic("error")}finally{busy(false)}};
 $("#exBack").onclick=()=>exView(false);
-$("#exSave").onclick=async()=>{if(!out)return;const f=new File([out.blob],out.name,{type:out.blob.type});
+/* ---------- Reliable image saving ---------- */
+async function saveExportedImage(){
+ if(!out||!out.blob)return toast("No image available to save","warn");
+ const blob=out.blob,filename=out.name||"bangaliicon-image.png";
+
+ /* 1. Native share sheet when the environment supports file sharing. */
  try{
-  if(!mobile&&window.showSaveFilePicker){const ext="."+out.name.split(".").pop(),h=await showSaveFilePicker({suggestedName:out.name,types:[{description:"Image",accept:{[out.blob.type]:[ext]}}]}),w=await h.createWritable();await w.write(out.blob);await w.close();toast("Saved "+out.name,"ok");haptic("success");return}
-  if(mobile&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Bangali Icon"});toast("Choose Save Image in the share sheet","ok");return}
- }catch(e){if(e&&e.name==="AbortError")return}
- const a=document.createElement("a");a.href=out.url;a.download=out.name;a.style.display="none";document.body.append(a);a.click();a.remove();
- toast("Download started. If nothing appears, press and hold the image.","ok")};
+  const file=new File([blob],filename,{type:blob.type||"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+   await navigator.share({files:[file],title:"Bangali Icon",text:"Exported image"});
+   toast("Choose Save Image / Save to Photos","ok");
+   haptic("success");
+   return;
+  }
+ }catch(e){
+  if(e&&e.name==="AbortError")return;
+  console.warn("Native share failed:",e);
+ }
+
+ /* 2. Native desktop Save dialog. */
+ try{
+  if(typeof window.showSaveFilePicker==="function"){
+   const ext=filename.includes(".")?"."+filename.split(".").pop():".png";
+   const handle=await window.showSaveFilePicker({
+    suggestedName:filename,
+    types:[{description:"Image",accept:{[blob.type||"image/png"]:[ext]}}]
+   });
+   const writable=await handle.createWritable();
+   await writable.write(blob);
+   await writable.close();
+   toast("Image saved successfully","ok");
+   haptic("success");
+   return;
+  }
+ }catch(e){
+  if(e&&e.name==="AbortError")return;
+  console.warn("File picker failed:",e);
+ }
+
+ /* 3. Browser download using a fresh object URL. Never open the blob URL. */
+ try{
+  const downloadUrl=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=downloadUrl;
+  a.download=filename;
+  a.rel="noopener";
+  a.style.position="fixed";
+  a.style.left="-9999px";
+  a.style.top="-9999px";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(downloadUrl),2000);
+  toast("Download started","ok");
+  haptic("success");
+  return;
+ }catch(e){
+  console.warn("Blob download failed:",e);
+ }
+
+ /* 4. Data-URL fallback for embedded WebViews that ignore blob downloads. */
+ try{
+  const reader=new FileReader();
+  reader.onload=()=>{
+   try{
+    const a=document.createElement("a");
+    a.href=reader.result;
+    a.download=filename;
+    a.rel="noopener";
+    a.style.position="fixed";
+    a.style.left="-9999px";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast("Download started","ok");
+    haptic("success");
+   }catch(err){
+    console.error("Data URL download failed:",err);
+    toast("Download blocked. Press and hold the image, then choose Save Image.","warn");
+   }
+  };
+  reader.onerror=()=>toast("Download blocked. Press and hold the image, then choose Save Image.","warn");
+  reader.readAsDataURL(blob);
+ }catch(e){
+  console.error("Final save fallback failed:",e);
+  toast("Download blocked. Press and hold the image, then choose Save Image.","warn");
+ }
+}
+
+$("#exSave").onclick=saveExportedImage;
 
 /* ---------- Send / Profile ---------- */
 $("#sendBtn").onclick=()=>{if(!img)return;if(!rateOk())return toast("Please wait ~"+wait()+"s ("+used()+"/"+RMAX+" used)","warn");
